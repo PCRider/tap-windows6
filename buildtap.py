@@ -23,7 +23,7 @@ class BuildTAPWindows(object):
 
         # path to EWDK
         self.ewdk_path = paths.EWDK
-        self.ewdk_cmd = os.path.join(self.ewdk_path, "BuildEnv", "SetupBuildEnv.cmd")
+        self.ewdk_cmd = os.path.join(self.ewdk_path, "Tools", "VsDevCmd.bat")
 
         # path to makensis
         self.makensis = os.path.join(paths.NSIS, 'makensis.exe')
@@ -71,7 +71,7 @@ class BuildTAPWindows(object):
 
     # run a command
     def system(self, cmd):
-        print "RUN:", cmd
+        print("RUN:", cmd)
         os.system(cmd)
 
     # make a directory
@@ -81,7 +81,7 @@ class BuildTAPWindows(object):
         except:
             pass
         else:
-            print "MKDIR", dir
+            print("MKDIR", dir)
 
     # make a directory including parents
     def makedirs(self, dir):
@@ -90,11 +90,11 @@ class BuildTAPWindows(object):
         except:
             pass
         else:
-            print "MAKEDIRS", dir
+            print("MAKEDIRS", dir)
 
     # copy a file
     def cp(self, src, dest):
-        print "COPY %s %s" % (src, dest)
+        print("COPY %s %s" % (src, dest))
         shutil.copy2(src, dest)
 
     # make a tarball
@@ -105,16 +105,16 @@ class BuildTAPWindows(object):
         tar = tarfile.open(output_filename, "w:gz")
         tar.add(source_dir, arcname=arcname)
         tar.close()
-        print "***** Generated tarball:", output_filename
+        print("***** Generated tarball:", output_filename)
 
     # remove a file
     def rm(self, file):
-        print "RM", file
+        print("RM", file)
         os.remove(file)
 
     # remove whole directory tree, like rm -rf
     def rmtree(self, dir):
-        print "RMTREE", dir
+        print("RMTREE", dir)
         shutil.rmtree(dir, ignore_errors=True)
 
     # return path of dist directory
@@ -235,11 +235,11 @@ class BuildTAPWindows(object):
 
     # build, sign, and verify tap driver
     def build_tap(self):
-        print "***** BUILD TAP config"
+        print ("***** BUILD TAP config")
         self.config_tap()
         project_file = os.path.join(self.src, "tap-windows6.vcxproj")
         for arch in self.architectures_supported:
-            print "***** BUILD TAP arch=%s" % (arch,)
+            print ("***** BUILD TAP arch=%s" % (arch,))
             self.build_ewdk(project_file=project_file, arch=arch)
             self.copy_tap_to_dist(arch=arch)
             if self.codesign:
@@ -251,9 +251,9 @@ class BuildTAPWindows(object):
         using_prebuilt = not os.path.isfile(project_file)
 
         for arch in self.architectures_supported:
-            print "***** BUILD TAPINSTALL arch=%s" % (arch,)
+            print("***** BUILD TAPINSTALL arch=%s" % (arch,))
             if using_prebuilt:
-                print "***** BUILD TAPINSTALL - devcon solution file not found; relying on prebuilt binary"
+                print("***** BUILD TAPINSTALL - devcon solution file not found; relying on prebuilt binary")
             else:
                 self.build_ewdk(project_file=project_file, arch=arch)
             self.copy_tapinstall_to_dist(arch)
@@ -268,7 +268,7 @@ class BuildTAPWindows(object):
             self.build_tapinstall()
         self.copy_dist_src_to_dist()
 
-        print "***** Generated files"
+        print("***** Generated files")
         self.dump_dist()
 
         tapbase = "tapoas6" if self.opt.oas else "tap6"
@@ -334,7 +334,7 @@ class BuildTAPWindows(object):
     # show files in dist
     def dump_dist(self):
         for f in self.enum_tree(self.dist_path()):
-            print f
+            print(f)
 
     # remove generated files from given directory tree
     def clean_tree(self, top):
@@ -393,7 +393,7 @@ class BuildTAPWindows(object):
         elif arch == "i386":
             oslist = "Vista_X86,Server2008_X86,7_X86"
         else:
-            print "ERROR: inf2cat OS list not known for architecture %s!!" % (arch)
+            print("ERROR: inf2cat OS list not known for architecture %s!!" % (arch))
         self.run_ewdk("%s /driver:%s /os:%s" % (self.inf2cat_cmd, self.mkdir_dist(arch), oslist))
 
     def sign(self, file):
